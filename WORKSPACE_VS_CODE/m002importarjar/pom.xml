@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.alv.unc.importador</groupId>
+    <artifactId>m002importarjar</artifactId>
+    <version>1.0-SNAPSHOT</version>
+
+    <properties>
+        <maven.compiler.source>17</maven.compiler.source>
+        <maven.compiler.target>17</maven.compiler.target>
+    </properties>
+    <dependencies>
+        <dependency>
+            <groupId>com.unc.proyecto.maven</groupId>
+            <artifactId>m001</artifactId>
+            <version>1.0.0</version>
+
+            <scope>system</scope>
+            <systemPath>D:\WORKSPACE\WORKSPACE_JAVA\JAVA_AVANZADO\220724 - Curso de Java Avanzado Spring Framework\220724_java_avanzado_spring_framework\WORKSPACE_VS_CODE\m001convertir_json\m001convertir_json.jar</systemPath>
+        </dependency>
+
+
+        <dependency>
+            <groupId>com.github.yannrichet</groupId>
+            <artifactId>JMathPlot</artifactId>
+            <version>1.0.1</version>
+        </dependency>
+
+    </dependencies>
+</project>
