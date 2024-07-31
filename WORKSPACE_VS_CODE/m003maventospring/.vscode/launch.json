@@ -1,0 +1,14 @@
+{
+    "configurations": [
+        {
+            "type": "java",
+            "name": "Spring Boot-Main<m003maventospring>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "com.maven.to.spring.Main",
+            "projectName": "m003maventospring",
+            "args": "",
+            "envFile": "${workspaceFolder}/.env"
+        }
+    ]
+}
