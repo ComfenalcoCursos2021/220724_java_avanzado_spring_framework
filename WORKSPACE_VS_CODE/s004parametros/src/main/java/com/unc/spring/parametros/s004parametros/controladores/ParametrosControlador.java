@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.RestController;
 import jakarta.servlet.http.HttpServletRequest;
 
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 
@@ -42,6 +43,14 @@ public class ParametrosControlador {
         String name = request.getParameter("nombre");
         String lastname = request.getParameter("apellido");
         return "INYECCION:: El nombre: " + name + " el apellido " + lastname;
+    }
+
+    @PostMapping("inyeccionpost")
+    public String metodoInyeccionPost(HttpServletRequest request) {
+
+        String name = request.getParameter("nombre");
+        String lastname = request.getParameter("apellido");
+        return "INYECCION::POST:: El nombre: " + name + " el apellido " + lastname;
     }
     
     
