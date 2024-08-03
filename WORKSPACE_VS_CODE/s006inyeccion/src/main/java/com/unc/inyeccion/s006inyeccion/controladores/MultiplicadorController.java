@@ -15,8 +15,12 @@ import com.unc.inyeccion.s006inyeccion.dtos.UsuarioDto;
 @RequestMapping("api/multiplicador")
 public class MultiplicadorController {
 
-    @Autowired
+    
     private AuxiliarUsuarios auxiliar;
+
+    public MultiplicadorController(AuxiliarUsuarios auxiliarDesdeSpring ) {
+        this.auxiliar = auxiliarDesdeSpring;
+    }
 
     @GetMapping()
     public List<UsuarioDto> getMethodName() {
