@@ -19,18 +19,23 @@ public class ParametroEntity {
     private String nombre;
     private String valor;
     private Date fechaActualizacion; 
-
+    
 
     
     public ParametroEntity() {
     }
-    
-    public ParametroEntity(int id, String nombre, String valor, Date fechaActualizacion) {
+    public ParametroEntity(Integer id, String nombre, String valor, Date fechaActualizacion {
         this.id = id;
         this.nombre = nombre;
         this.valor = valor;
-        this.fechaActualizacion = fechaActualizacion;
+        this.fechaActualizacion = fechaActualizacion;        
     }
+
+
+
+
+
+
 
     public Integer getId() {
         return id;
@@ -55,7 +60,5 @@ public class ParametroEntity {
     }
     public void setFechaActualizacion(Date fechaActualizacion) {
         this.fechaActualizacion = fechaActualizacion;
-    }
-
-    
+    }    
 }

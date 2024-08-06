@@ -26,7 +26,7 @@ public class ToderoHandler {
         return error;
     }
 
-    /* 
+    
     @ExceptionHandler({TontoException.class})
     @ResponseStatus(HttpStatus.CONFLICT)
     public ErrorDto errorElementoNoEncontrado(TontoException e){
@@ -36,5 +36,5 @@ public class ToderoHandler {
         error.setStatus(HttpStatus.CONFLICT.toString());
         error.setExceptionMessage(e.getMessage());
         return error;
-    }*/
+    }
 }
