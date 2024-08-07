@@ -28,5 +28,5 @@ public class ParametroEntity {
     private String nombre;
     private String valor;
     private Date fechaActualizacion; 
-    private Integer IdUsuarioActulizacion;
+    private Integer IdUsuarioActualizacion;
 }
