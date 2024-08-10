@@ -1,11 +1,6 @@
 package com.unc.arq.s010arquitenctura2.controllers;
 
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
-import com.unc.arq.s010arquitenctura2.bl.FestivoBl;
-import com.unc.arq.s010arquitenctura2.dtos.FestivoDto;
-import com.unc.arq.s010arquitenctura2.dtos.ResultadoDto;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -14,6 +9,12 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.unc.arq.s010arquitenctura2.bl.FestivoBl;
+import com.unc.arq.s010arquitenctura2.dtos.FestivoDto;
+import com.unc.arq.s010arquitenctura2.dtos.ResultadoDto;
 
 
 
@@ -26,27 +27,27 @@ public class FestivoController {
     private FestivoBl bl;
 
     @GetMapping()
-    public ResultadoDto obtenerTodos() {
+    public ResultadoDto<List<FestivoDto>> obtenerTodos() {
         return this.bl.obtenerTodos();
     }
 
     @GetMapping("/{id}")
-    public ResultadoDto obtenerPorId(@PathVariable int id) {
+    public ResultadoDto<FestivoDto> obtenerPorId(@PathVariable int id) {
         return this.bl.obtenerPorId(id);
     }
     
     @PostMapping()
-    public ResultadoDto guardar(@RequestBody FestivoDto dto) {
+    public ResultadoDto<FestivoDto> guardar(@RequestBody FestivoDto dto) {
         return this.bl.guardar(dto);
     }
 
     @PutMapping()
-    public ResultadoDto actualizar(@RequestBody FestivoDto dto) {
+    public ResultadoDto<FestivoDto> actualizar(@RequestBody FestivoDto dto) {
         return this.bl.actualizar(dto);
     }
 
     @DeleteMapping("/{id}")
-    public ResultadoDto borrar(@PathVariable int id) {
+    public ResultadoDto<FestivoDto> borrar(@PathVariable int id) {
         return this.bl.borrar(id);
     }
     

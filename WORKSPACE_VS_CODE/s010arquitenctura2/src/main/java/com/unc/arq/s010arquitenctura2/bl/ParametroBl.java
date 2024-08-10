@@ -1,6 +1,6 @@
 package com.unc.arq.s010arquitenctura2.bl;
 
-import java.util.Arrays;
+import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,62 +25,26 @@ public class ParametroBl {
 
     private ObjectMapper mapper = new ObjectMapper();
 
-    public ResultadoDto obtenerPorId(int id) {
+    public ResultadoDto<ParametroDto> obtenerPorId(int id) {
 
         try {
             var optEntity = this.dal.obtenerPorId(id);
-            if (optEntity.isPresent()) {
-                /*
-                 * OPCION 1
-                 * var parametroDto = new ParametroDto();
-                 * parametroDto.setFechaActualizacion(optEntity.get().getFechaActualizacion());
-                 * parametroDto.setId(optEntity.get().getId());
-                 * parametroDto.setNombre(optEntity.get().getNombre());
-                 * parametroDto.setValor(optEntity.get().getValor());
-                 * return parametroDto;
-                 */
-                /*
-                 * OPCION 2
-                 * var parametroDto = ParametroDto.builder()
-                 * .nombre(optEntity.get().getNombre())
-                 * .fechaActualizacion(optEntity.get().getFechaActualizacion())
-                 * .id(optEntity.get().getId())
-                 * .valor(optEntity.get().getValor())
-                 * .build();
-                 */
-                /*
-                 * OPCION 3
-                 * var entityComoTexto = this.mapper.writeValueAsString(optEntity.get());
-                 * var parametroDto = this.mapper.readValue(entityComoTexto,
-                 * ParametroDto.class);
-                 */
-                /* OPCION 4 */
+            if (optEntity.isPresent()) {                
                 var parametroDto = this.mapper.convertValue(optEntity.get(), ParametroDto.class);
-                return ResultadoDto.builder()
-                        .todoOk(true)
-                        .data(parametroDto)
-                        .message("")
-                        .build();
+                return ResultadoDto.<ParametroDto>ok(parametroDto);
             }
         } catch (CannotCreateTransactionException e) {
-            return ResultadoDto.builder()
-                    .todoOk(false)
-                    .message("Error de ALGO :: Por favor intente mas tarde")
-                    .build();
+            return ResultadoDto.<ParametroDto>falla("Error de ALGO :: Por favor intente mas tarde");
+                    
         } catch (Exception e) {
-            return ResultadoDto.builder()
-                    .todoOk(false)
-                    .message("Error de ALGO :: " + e.getMessage() + " - " + e.getClass())
-                    .build();
+            return ResultadoDto.<ParametroDto>falla("Error de ALGO :: " + e.getMessage() + " - " + e.getClass());                    
         }
 
-        return ResultadoDto.builder()
-                .todoOk(true)
-                .message("Elemento no encontrado")
-                .build();
+        return ResultadoDto.<ParametroDto>ok("Elemento no encontrado");
+                
     }
 
-    public ResultadoDto obtenerTodos() {
+    public ResultadoDto<List<ParametroDto>> obtenerTodos() {
 
         try {
             var listaEntities = this.dal.obtenerTodos();
@@ -88,25 +52,16 @@ public class ParametroBl {
                     .map(entidad -> this.mapper.convertValue(entidad, ParametroDto.class))
                     .collect(Collectors.toList());
 
-            return ResultadoDto.builder()
-                    .todoOk(true)
-                    .message("")
-                    .data(listaDto).build();
+            return ResultadoDto.<List<ParametroDto>>ok(listaDto);
 
         } catch (CannotCreateTransactionException e) {
-            return ResultadoDto.builder()
-                    .todoOk(false)
-                    .message("Error de ALGO :: Por favor intente mas tarde")
-                    .build();
+            return ResultadoDto.<List<ParametroDto>>falla("Error de ALGO :: Por favor intente mas tarde");
         } catch (Exception e) {
-            return ResultadoDto.builder()
-                    .todoOk(false)
-                    .message("Error de ALGO :: " + e.getMessage() + " - " + e.getClass())
-                    .build();
+            return ResultadoDto.<List<ParametroDto>>falla("Error de ALGO :: " + e.getMessage() + " - " + e.getClass());
         }
     }
 
-    public ResultadoDto guardar(ParametroDto paraGuardarDto) {
+    public ResultadoDto<ParametroDto> guardar(ParametroDto paraGuardarDto) {
 
         try {
             ParametroEntity paraGuardarEntity = this.mapper.convertValue(paraGuardarDto, ParametroEntity.class);
@@ -114,26 +69,17 @@ public class ParametroBl {
             ParametroEntity guardardoEntity = this.dal.guarda(paraGuardarEntity);
             ParametroDto guardadoDto = this.mapper.convertValue(guardardoEntity, ParametroDto.class);
             
-            return ResultadoDto.builder()
-                .todoOk(true)
-                .data(guardadoDto)
-                .build();
+            return ResultadoDto.<ParametroDto>ok(guardadoDto);
 
             
         } catch (CannotCreateTransactionException e) {
-            return ResultadoDto.builder()
-                    .todoOk(false)
-                    .message("Error de ALGO :: Por favor intente mas tarde")
-                    .build();
+            return ResultadoDto.<ParametroDto>falla("Error de ALGO :: Por favor intente mas tarde");
         } catch (Exception e) {
-            return ResultadoDto.builder()
-                    .todoOk(false)
-                    .message("Error de ALGO :: " + e.getMessage() + " - " + e.getClass())
-                    .build();
+            return ResultadoDto.<ParametroDto>falla("Error de ALGO :: " + e.getMessage() + " - " + e.getClass());
         }
     }
 
-    public ResultadoDto actualizar(ParametroDto paraActualizarDto) {
+    public ResultadoDto<ParametroDto> actualizar(ParametroDto paraActualizarDto) {
 
         try {
 
@@ -142,45 +88,31 @@ public class ParametroBl {
             ParametroEntity actualizadoEntity = this.dal.actualizar(paraActualizarEntity);
             ParametroDto actualizadoDto = this.mapper.convertValue(actualizadoEntity, ParametroDto.class);
 
-            var respuesta = ResultadoDto.builder()
-                    .todoOk(actualizadoDto != null)
-                    .message(actualizadoDto == null ? "El elemento no fue encontrado, por tanto no actualizo nada" : "")
-                    .data(actualizadoDto)
-                    .build();
+            var respuesta = ResultadoDto.<ParametroDto>ok
+                        (
+                            actualizadoDto,
+                            actualizadoDto == null ? 
+                            "El elemento no fue encontrado, por tanto no actualizo nada" : ""
+                        );
+                    
 
             return respuesta;
         } catch (CannotCreateTransactionException e) {
-            return ResultadoDto.builder()
-                    .todoOk(false)
-                    .message("Error de ALGO :: Por favor intente mas tarde")
-                    .build();
+            return ResultadoDto.<ParametroDto>falla("Error de ALGO :: Por favor intente mas tarde");
         } catch (Exception e) {
-            return ResultadoDto.builder()
-                    .todoOk(false)
-                    .message("Error de ALGO :: " + e.getMessage() + " - " + e.getClass())
-                    .build();
+            return ResultadoDto.<ParametroDto>falla("Error de ALGO :: " + e.getMessage() + " - " + e.getClass());
         }
 
     }
 
-    public ResultadoDto borrar(int id) {
+    public ResultadoDto<ParametroDto> borrar(int id) {
 
         try {
-
-            return ResultadoDto.builder()
-                    .todoOk(true)
-                    .message(this.dal.borrar(id) ? "Borrado con exito" : "No fue posible borrar")
-                    .build();
+            return ResultadoDto.<ParametroDto>ok(this.dal.borrar(id) ? "Borrado con exito" : "No fue posible borrar");
         } catch (CannotCreateTransactionException e) {
-            return ResultadoDto.builder()
-                    .todoOk(false)
-                    .message("Error de ALGO :: Por favor intente mas tarde")
-                    .build();
+            return ResultadoDto.<ParametroDto>falla("Error de ALGO :: Por favor intente mas tarde");
         } catch (Exception e) {
-            return ResultadoDto.builder()
-                    .todoOk(false)
-                    .message("Error de ALGO :: " + e.getMessage() + " - " + e.getClass())
-                    .build();
+            return ResultadoDto.<ParametroDto>falla("Error de ALGO :: " + e.getMessage() + " - " + e.getClass());                    
         }
 
     }

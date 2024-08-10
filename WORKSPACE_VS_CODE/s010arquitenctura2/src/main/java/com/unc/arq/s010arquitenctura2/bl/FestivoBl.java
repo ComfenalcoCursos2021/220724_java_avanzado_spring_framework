@@ -1,21 +1,20 @@
 package com.unc.arq.s010arquitenctura2.bl;
 
-import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.Arrays;
+import java.time.LocalDate;
+import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.autoconfigure.gson.GsonBuilderCustomizer;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.CannotCreateTransactionException;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.json.JsonMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
+import com.unc.arq.s010arquitenctura2.configuraciones.LocalDateDeserializer;
 import com.unc.arq.s010arquitenctura2.dal.FestivoDal;
 import com.unc.arq.s010arquitenctura2.dtos.FestivoDto;
 import com.unc.arq.s010arquitenctura2.dtos.ResultadoDto;
@@ -30,19 +29,18 @@ public class FestivoBl {
     @Value("${usuario.atualizacion}")
     private int ID_USUARIO_ACTUALIZACION;
 
-    @Autowired
-    private GsonBuilderCustomizer gsonBuilderCustomizer;
+    private ObjectMapper mapper = new ObjectMapper();
 
-    private ObjectMapper mapper = JsonMapper.builder()
-        .addModule(new JavaTimeModule())
-        .build();
+    public FestivoBl() {
+        mapper.registerModule(new JavaTimeModule());
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+        mapper.setDateFormat(dateFormat);
+        mapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
+        mapper.registerModule(new SimpleModule().addDeserializer(LocalDate.class, new LocalDateDeserializer()));
 
-    public FestivoBl(){
-        DateFormat df = new SimpleDateFormat("d/MM/yyyy");
-        mapper.setDateFormat(df);
     }
 
-    public ResultadoDto obtenerPorId(int id) {
+    public ResultadoDto<FestivoDto> obtenerPorId(int id) {
 
         try {
             var optEntity = this.dal.obtenerPorId(id);
@@ -72,121 +70,148 @@ public class FestivoBl {
                  * FestivoDto.class);
                  */
                 /* OPCION 4 */
-                var parametroDto = this.mapper.convertValue(optEntity.get(), FestivoDto.class);
-                return ResultadoDto.builder()
-                        .todoOk(true)
-                        .data(parametroDto)
-                        .message("")
-                        .build();
+                var festivoDto = this.mapper.convertValue(optEntity.get(), FestivoDto.class);
+                /*
+                 * return ResultadoDto.<FestivoDto>builder()
+                 * .todoOk(true)
+                 * .data(festivoDto)
+                 * .message("")
+                 * .build();
+                 */
+                return ResultadoDto.<FestivoDto>ok(festivoDto);
+
             }
         } catch (CannotCreateTransactionException e) {
-            return ResultadoDto.builder()
-                    .todoOk(false)
-                    .message("Error de ALGO :: Por favor intente mas tarde")
-                    .build();
+            /*
+             * return ResultadoDto.<FestivoDto>builder()
+             * .todoOk(false)
+             * .message("Error de ALGO :: Por favor intente mas tarde")
+             * .build();
+             */
+            return ResultadoDto.<FestivoDto>falla("Error de ALGO :: Por favor intente mas tarde");
         } catch (Exception e) {
-            return ResultadoDto.builder()
-                    .todoOk(false)
-                    .message("Error de ALGO :: " + e.getMessage() + " - " + e.getClass())
-                    .build();
+            /*
+             * return ResultadoDto.<FestivoDto>builder()
+             * .todoOk(false)
+             * .message("Error de ALGO :: " + e.getMessage() + " - " + e.getClass())
+             * .build();
+             */
+            return ResultadoDto.<FestivoDto>falla("Error de ALGO :: " + e.getMessage() + " - " + e.getClass());
         }
 
-        return ResultadoDto.builder()
-                .todoOk(true)
-                .message("Elemento no encontrado")
-                .build();
+        /*
+         * return ResultadoDto.<FestivoDto>builder()
+         * .todoOk(true)
+         * .message("Elemento no encontrado")
+         * .build();
+         */
+        return ResultadoDto.<FestivoDto>ok("Elemento no encontrado");
     }
 
-    public ResultadoDto obtenerTodos() {
+    public ResultadoDto<List<FestivoDto>> obtenerTodos() {
 
         try {
             var listaEntities = this.dal.obtenerTodos();
-            var listaDto = listaEntities.stream()
-                    .map(entidad -> 
-                    
-                        
-                        FestivoDto.builder()
-                                                .descripcion(entidad.getDescripcion())
-                                                .id(entidad.getId())
-                                                .fecha(entidad.getFecha())
-                                                .pais(entidad.getPais())
-                                                .build()
-                    
+            List<FestivoDto> listaDto = listaEntities.stream()
+                    .map(entidad ->
+
+                    FestivoDto.builder()
+                            .descripcion(entidad.getDescripcion())
+                            .id(entidad.getId())
+                            .fecha(entidad.getFecha())
+                            .pais(entidad.getPais())
+                            .build()
+
                     )
-                    .collect(Collectors.toList());
+                    .collect(Collectors.<FestivoDto>toList());
 
-            return ResultadoDto.builder()
-                    .todoOk(true)
-                    .message("")
-                    .data(listaDto).build();
+            /*
+             * return ResultadoDto.<List<FestivoDto>>builder()
+             * .todoOk(true)
+             * .message("")
+             * .data(listaDto).build();
+             */
+            return ResultadoDto.<List<FestivoDto>>ok(listaDto);
 
         } catch (CannotCreateTransactionException e) {
-            return ResultadoDto.builder()
-                    .todoOk(false)
-                    .message("Error de ALGO :: Por favor intente mas tarde")
-                    .build();
+            /*
+             * return ResultadoDto.<List<FestivoDto>>builder()
+             * .todoOk(false)
+             * .message("Error de ALGO :: Por favor intente mas tarde")
+             * .build();
+             */
+            return ResultadoDto.<List<FestivoDto>>falla("Error de ALGO :: Por favor intente mas tarde");
         } catch (Exception e) {
-            return ResultadoDto.builder()
-                    .todoOk(false)
-                    .message("Error de ALGO :: " + e.getMessage() + " - " + e.getClass())
-                    .build();
+            /*
+             * return ResultadoDto.<List<FestivoDto>>builder()
+             * .todoOk(false)
+             * .message("Error de ALGO :: " + e.getMessage() + " - " + e.getClass())
+             * .build();
+             */
+            return ResultadoDto.<List<FestivoDto>>falla("Error de ALGO :: " + e.getMessage() + " - " + e.getClass());
         }
     }
 
-    public ResultadoDto guardar(FestivoDto paraGuardarDto) {
+    public ResultadoDto<FestivoDto> guardar(FestivoDto paraGuardarDto) {
 
-        try {        
-            
-            
-            //FestivoEntity paraGuardarEntity = this.mapper.convertValue(paraGuardarDto, FestivoEntity.class);
-            
-            
+        try {
+
+            // FestivoEntity paraGuardarEntity = this.mapper.convertValue(paraGuardarDto,
+            // FestivoEntity.class);
+
             FestivoEntity paraGuardarEntity = FestivoEntity.builder()
-                                                .descripcion(paraGuardarDto.getDescripcion())
-                                                .id(paraGuardarDto.getId())
-                                                .fecha(paraGuardarDto.getFecha())
-                                                .pais(paraGuardarDto.getPais())
-                                                .build();
-            
+                    .descripcion(paraGuardarDto.getDescripcion())
+                    .id(paraGuardarDto.getId())
+                    .fecha(paraGuardarDto.getFecha())
+                    .pais(paraGuardarDto.getPais())
+                    .build();
+
             FestivoEntity guardardoEntity = this.dal.guarda(paraGuardarEntity);
+
             FestivoDto guardadoDto = FestivoDto.builder()
-            .descripcion(guardardoEntity.getDescripcion())
-            .id(guardardoEntity.getId())
-            .fecha(guardardoEntity.getFecha())
-            .pais(guardardoEntity.getPais())
-            .build();
-            
+                    .descripcion(guardardoEntity.getDescripcion())
+                    .id(guardardoEntity.getId())
+                    .fecha(guardardoEntity.getFecha())
+                    .pais(guardardoEntity.getPais())
+                    .build();
 
+            /*
+             * return ResultadoDto.<FestivoDto>builder()
+             * .todoOk(true)
+             * .data(guardadoDto)
+             * .build();
+             */
+            return ResultadoDto.<FestivoDto>ok(guardadoDto);
 
-            return ResultadoDto.builder()
-                .todoOk(true)
-                .data(guardadoDto)
-                .build();
-
-            
         } catch (CannotCreateTransactionException e) {
-            return ResultadoDto.builder()
-                    .todoOk(false)
-                    .message("Error de ALGO :: Por favor intente mas tarde")
-                    .build();
+            /*
+             * return ResultadoDto.<FestivoDto>builder()
+             * .todoOk(false)
+             * .message("Error de ALGO :: Por favor intente mas tarde")
+             * .build();
+             */
+            return ResultadoDto.<FestivoDto>falla("Error de ALGO :: Por favor intente mas tarde");
         } catch (Exception e) {
-            return ResultadoDto.builder()
-                    .todoOk(false)
-                    .message("Error de ALGO :: " + e.getMessage() + " - " + e.getClass())
-                    .build();
+            /*
+             * return ResultadoDto.<FestivoDto>builder()
+             * .todoOk(false)
+             * .message("Error de ALGO :: " + e.getMessage() + " - " + e.getClass())
+             * .build();
+             */
+            return ResultadoDto.<FestivoDto>falla("Error de ALGO :: " + e.getMessage() + " - " + e.getClass());
         }
     }
 
-    public ResultadoDto actualizar(FestivoDto paraActualizarDto) {
+    public ResultadoDto<FestivoDto> actualizar(FestivoDto paraActualizarDto) {
 
         try {
 
             FestivoEntity paraActualizarEntity = this.mapper.convertValue(paraActualizarDto, FestivoEntity.class);
-            
+
             FestivoEntity actualizadoEntity = this.dal.actualizar(paraActualizarEntity);
             FestivoDto actualizadoDto = this.mapper.convertValue(actualizadoEntity, FestivoDto.class);
 
-            var respuesta = ResultadoDto.builder()
+            var respuesta = ResultadoDto.<FestivoDto>builder()
                     .todoOk(actualizadoDto != null)
                     .message(actualizadoDto == null ? "El elemento no fue encontrado, por tanto no actualizo nada" : "")
                     .data(actualizadoDto)
@@ -194,37 +219,46 @@ public class FestivoBl {
 
             return respuesta;
         } catch (CannotCreateTransactionException e) {
-            return ResultadoDto.builder()
-                    .todoOk(false)
-                    .message("Error de ALGO :: Por favor intente mas tarde")
-                    .build();
+            /*
+             * return ResultadoDto.<FestivoDto>builder()
+             * .todoOk(false)
+             * .message("Error de ALGO :: Por favor intente mas tarde")
+             * .build();
+             */
+            return ResultadoDto.<FestivoDto>falla("Error de ALGO :: Por favor intente mas tarde");
         } catch (Exception e) {
-            return ResultadoDto.builder()
-                    .todoOk(false)
-                    .message("Error de ALGO :: " + e.getMessage() + " - " + e.getClass())
-                    .build();
+            /*
+             * return ResultadoDto.<FestivoDto>builder()
+             * .todoOk(false)
+             * .message("Error de ALGO :: " + e.getMessage() + " - " + e.getClass())
+             * .build();
+             */
+            return ResultadoDto.<FestivoDto>falla("Error de ALGO :: " + e.getMessage() + " - " + e.getClass());
         }
 
     }
 
-    public ResultadoDto borrar(int id) {
+    public ResultadoDto<FestivoDto> borrar(int id) {
 
         try {
 
-            return ResultadoDto.builder()
+            /*return ResultadoDto.<FestivoDto>builder()
                     .todoOk(true)
                     .message(this.dal.borrar(id) ? "Borrado con exito" : "No fue posible borrar")
-                    .build();
+                    .build();*/
+            return ResultadoDto.<FestivoDto>ok(this.dal.borrar(id) ? "Borrado con exito" : "No fue posible borrar");
         } catch (CannotCreateTransactionException e) {
-            return ResultadoDto.builder()
+            /*return ResultadoDto.<FestivoDto>builder()
                     .todoOk(false)
                     .message("Error de ALGO :: Por favor intente mas tarde")
-                    .build();
+                    .build();*/
+                    return ResultadoDto.<FestivoDto>falla("Error de ALGO :: Por favor intente mas tarde");
         } catch (Exception e) {
-            return ResultadoDto.builder()
+            /*return ResultadoDto.<FestivoDto>builder()
                     .todoOk(false)
                     .message("Error de ALGO :: " + e.getMessage() + " - " + e.getClass())
-                    .build();
+                    .build();*/
+                    return ResultadoDto.<FestivoDto>falla("Error de ALGO :: " + e.getMessage() + " - " + e.getClass());
         }
 
     }
