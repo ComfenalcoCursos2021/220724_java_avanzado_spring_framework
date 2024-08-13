@@ -36,6 +36,9 @@ public class ConfiguracionControlador {
     @Value("#{${miproyecto.estructura}}")
     private Map<String,Object> VALORES_MAPA;
 
+    @Value("${miproyecto.password}")
+    private String password;
+
     @GetMapping()
     public Map<String,Object> getTodosLosParametros(@Value("${miproyecto.mensaje.bienvenida}") String elMensaje) {
 
@@ -47,6 +50,7 @@ public class ConfiguracionControlador {
         mapa.put("dias_texto",this.DIAS);
         mapa.put("Mensaje",elMensaje);
         mapa.put("LaEstructura", this.VALORES_MAPA);
+        mapa.put("PASSWORD_VARIABLE_DE_ENTORNO", this.password );
         return mapa;
     }
 
