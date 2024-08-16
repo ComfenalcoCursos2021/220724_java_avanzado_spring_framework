@@ -1,0 +1,31 @@
+spring:
+  application:
+    name: s016gateway
+  cloud: 
+    gateway:
+      mvc:
+        routes:
+        - id: productos
+          uri: lb://S011PRODUCTOS
+          predicates:
+          - Path=/api/producto/**,/api/configuraciones
+        - id: parametrosfestivos
+          uri: lb://S013PARAMETROSFESTIVOS
+          predicates:
+          - Path=/api/festivo/**,/api/parametro/**
+
+
+
+
+server:
+  port: 9090
+
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:11000/eureka
+    fetch-registry: 'true'
+    register-with-eureka: 'true'
+  instance:
+    hostname: localhost
