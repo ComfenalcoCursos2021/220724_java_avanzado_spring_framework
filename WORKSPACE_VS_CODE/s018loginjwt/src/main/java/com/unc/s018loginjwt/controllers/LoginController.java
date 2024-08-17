@@ -30,7 +30,7 @@ public class LoginController {
     }
     @GetMapping("/{id}")
     public ResultadoDto<LoginDto> findById(@PathVariable long id){
-        return this.bl.findById(id)
+        return this.bl.findById(id);
     }
     @PostMapping
     public ResultadoDto<LoginDto> save(@RequestBody LoginDto login){
