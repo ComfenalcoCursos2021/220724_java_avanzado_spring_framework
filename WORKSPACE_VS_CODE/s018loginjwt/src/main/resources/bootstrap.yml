@@ -1,0 +1,8 @@
+spring:
+  cloud:
+    config:
+      uri: http://root:root@localhost:8888/
+  application:
+    name: login-service
+  profiles:
+    active: dev

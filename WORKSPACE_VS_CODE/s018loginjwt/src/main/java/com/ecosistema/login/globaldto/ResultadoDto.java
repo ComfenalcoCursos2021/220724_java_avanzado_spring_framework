@@ -1,4 +1,4 @@
-package com.unc.s018loginjwt.dtos;
+package com.ecosistema.login.globaldto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
